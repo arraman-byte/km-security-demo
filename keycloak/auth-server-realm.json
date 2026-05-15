@@ -1,0 +1,117 @@
+{
+  "realm": "auth-server",
+  "enabled": true,
+  "sslRequired": "none",
+  "registrationAllowed": true,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "resetPasswordAllowed": true,
+  "editUsernameAllowed": false,
+  "bruteForceProtected": false,
+  "accessTokenLifespan": 60,
+  "ssoSessionIdleTimeout": 1800,
+  "ssoSessionMaxLifespan": 36000,
+  "offlineSessionIdleTimeout": 2592000,
+  "oauth2DeviceCodeLifespan": 600,
+  "oauth2DevicePollingInterval": 5,
+  "users": [
+    {
+      "username": "demo",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Demo",
+      "lastName": "User",
+      "email": "demo@example.com",
+      "credentials": [
+        { "type": "password", "value": "demo", "temporary": false }
+      ],
+      "realmRoles": ["default-roles-auth-server"]
+    },
+    {
+      "username": "service-account-security-demo-m2m",
+      "enabled": true,
+      "serviceAccountClientId": "security-demo-m2m"
+    }
+  ],
+  "clients": [
+    {
+      "clientId": "security-demo-pkce",
+      "name": "Security Demo (PKCE)",
+      "enabled": true,
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "implicitFlowEnabled": false,
+      "serviceAccountsEnabled": false,
+      "redirectUris": ["http://localhost:8081/*"],
+      "webOrigins": ["http://localhost:8081"],
+      "attributes": {
+        "pkce.code.challenge.method": "S256",
+        "post.logout.redirect.uris": "http://localhost:8081/*"
+      },
+      "defaultClientScopes": ["web-origins", "profile", "roles", "email", "acr"],
+      "optionalClientScopes": ["offline_access", "microprofile-jwt"]
+    },
+    {
+      "clientId": "security-demo-authcode",
+      "name": "Security Demo (Auth Code, no PKCE)",
+      "enabled": true,
+      "publicClient": false,
+      "secret": "authcode-secret",
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "implicitFlowEnabled": false,
+      "serviceAccountsEnabled": false,
+      "redirectUris": ["http://localhost:8081/*"],
+      "webOrigins": ["http://localhost:8081"],
+      "attributes": {
+        "post.logout.redirect.uris": "http://localhost:8081/*"
+      },
+      "defaultClientScopes": ["web-origins", "profile", "roles", "email", "acr"],
+      "optionalClientScopes": ["offline_access", "microprofile-jwt"]
+    },
+    {
+      "clientId": "security-demo-m2m",
+      "name": "Security Demo (M2M)",
+      "enabled": true,
+      "publicClient": false,
+      "secret": "m2m-secret",
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "implicitFlowEnabled": false,
+      "serviceAccountsEnabled": true,
+      "defaultClientScopes": ["web-origins", "profile", "roles", "email"],
+      "optionalClientScopes": []
+    },
+    {
+      "clientId": "security-demo-device",
+      "name": "Security Demo (Device)",
+      "enabled": true,
+      "publicClient": true,
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "implicitFlowEnabled": false,
+      "serviceAccountsEnabled": false,
+      "attributes": {
+        "oauth2.device.authorization.grant.enabled": "true"
+      },
+      "defaultClientScopes": ["web-origins", "profile", "roles", "email"]
+    },
+    {
+      "clientId": "security-demo-implicit",
+      "name": "Security Demo (Implicit, deprecated)",
+      "enabled": true,
+      "publicClient": true,
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "implicitFlowEnabled": true,
+      "serviceAccountsEnabled": false,
+      "redirectUris": ["http://localhost:8081/*"],
+      "webOrigins": ["http://localhost:8081"],
+      "attributes": {
+        "post.logout.redirect.uris": "http://localhost:8081/*"
+      },
+      "defaultClientScopes": ["web-origins", "profile", "roles", "email"]
+    }
+  ]
+}

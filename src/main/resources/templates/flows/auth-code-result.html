@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: layout('Auth Code login result', ~{::main})}">
+<body>
+<main>
+  <h1>Auth Code (no PKCE) result</h1>
+  <p style="color:var(--muted);">
+    Same three tokens as PKCE, exchanged via the confidential client using the client secret.
+    Compare the access_token claims to the PKCE result &mdash; they differ in <code class="inline">azp</code>
+    (authorized party) and may differ in <code class="inline">scope</code>/audiences depending on Keycloak client config.
+  </p>
+
+  <div class="panel good">
+    <h3 style="margin-top:0;">Authenticated user</h3>
+    <dl class="kv">
+      <dt>preferred_username</dt><dd th:text="${user.preferredUsername}">u</dd>
+      <dt>email</dt><dd th:text="${user.email}">e</dd>
+      <dt>subject</dt><dd th:text="${user.subject}">s</dd>
+    </dl>
+  </div>
+
+  <div th:replace="~{fragments/token-card :: tokenCard('ID Token (OIDC)', ${idToken})}"></div>
+  <div th:replace="~{fragments/token-card :: tokenCard('Access Token (OAuth2)', ${accessToken})}"></div>
+  <div th:replace="~{fragments/token-card :: tokenCard('Refresh Token', ${refreshToken})}"></div>
+
+  <p style="margin-top:20px;">
+    <a class="btn secondary" th:href="@{/flows/auth-code-pkce}">Compare with PKCE &rarr;</a>
+    <a class="btn secondary" th:href="@{/logout}">Logout</a>
+  </p>
+</main>
+</body>
+</html>

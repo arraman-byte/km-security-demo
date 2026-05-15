@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: layout('Refresh Token', ~{::main})}">
+<body>
+<main>
+  <h1>Refresh Token</h1>
+  <p style="color:var(--muted);max-width:780px;">
+    Access tokens are short-lived (often 1&ndash;15 minutes). The <strong>refresh_token</strong> is a
+    long-lived credential the client can exchange for a fresh access_token without re-prompting the user.
+    Refresh tokens are <em>not</em> sent to resource servers &mdash; only to the authorization server's
+    <code class="inline">/token</code> endpoint.
+  </p>
+
+  <div class="panel">
+    <h3>Sequence</h3>
+    <ol class="steps">
+      <li>Client POSTs to <code class="inline">/token</code> with <code class="inline">grant_type=refresh_token</code>, <code class="inline">refresh_token</code>, <code class="inline">client_id</code> (+ secret if confidential).</li>
+      <li>Authorization server validates the refresh token and issues a fresh access_token (and optionally a rotated refresh_token).</li>
+      <li>Client replaces the old access_token (and the old refresh_token if rotated).</li>
+    </ol>
+  </div>
+
+  <div th:if="${accessTokenExpiresAt == null}" class="panel warn">
+    <p>No active session with a refresh token. Login first via
+      <a th:href="@{/flows/auth-code-pkce}">Authorization Code + PKCE</a> (scope
+      <code class="inline">offline_access</code> is already requested).</p>
+  </div>
+
+  <div th:if="${accessTokenExpiresAt != null}">
+    <div class="panel">
+      <h3 style="margin-top:0;">Current session</h3>
+      <dl class="kv">
+        <dt>access_token expires at</dt><dd th:text="${accessTokenExpiresAt}">t</dd>
+        <dt>has refresh_token</dt>
+        <dd>
+          <span class="badge good" th:if="${hasRefreshToken}">yes</span>
+          <span class="badge bad" th:if="${!hasRefreshToken}">no &mdash; enable offline_access scope</span>
+        </dd>
+      </dl>
+    </div>
+
+    <div th:replace="~{fragments/token-card :: tokenCard('Current Access Token', ${accessToken})}"></div>
+    <div th:replace="~{fragments/token-card :: tokenCard('Current Refresh Token', ${refreshToken})}"></div>
+
+    <p>
+      <a class="btn" th:href="@{/demo/refresh-info/run}">Force refresh &rarr;</a>
+    </p>
+  </div>
+</main>
+</body>
+</html>

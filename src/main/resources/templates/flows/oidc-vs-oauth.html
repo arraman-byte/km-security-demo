@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: layout('OAuth2 vs OIDC', ~{::main})}">
+<body>
+<main>
+  <h1>OAuth2 vs OpenID Connect</h1>
+  <p style="color:var(--muted);max-width:780px;">
+    <strong>OAuth 2.0</strong> is a delegated <em>authorization</em> framework: it lets an app obtain
+    an <em>access_token</em> to call APIs on behalf of a user or itself. It says nothing about
+    <em>who</em> the user is.
+    <strong>OpenID Connect (OIDC)</strong> is a thin identity layer built on top of OAuth 2.0 that adds
+    an <em>id_token</em> (a signed JWT describing the user), a <em>userinfo</em> endpoint, and a
+    standardised <em>discovery</em> document.
+  </p>
+
+  <div class="panel">
+    <h3 style="margin-top:0;">Side-by-side</h3>
+    <table>
+      <tr><th>Concern</th><th>OAuth 2.0</th><th>OpenID Connect</th></tr>
+      <tr><td>Purpose</td><td>Authorization (API access)</td><td>Authentication (login) + OAuth2</td></tr>
+      <tr><td>Token issued</td><td>access_token (often opaque or JWT)</td><td>id_token (always JWT) + access_token</td></tr>
+      <tr><td>Audience of token</td><td>Resource server / API</td><td>id_token aud = client</td></tr>
+      <tr><td>Scope to request</td><td>API-specific (e.g. <code class="inline">read:invoices</code>)</td><td>Must include <code class="inline">openid</code></td></tr>
+      <tr><td>Identity claims</td><td>Not standardised</td><td>sub, name, email, email_verified, picture, ...</td></tr>
+      <tr><td>Discovery</td><td>n/a</td><td><code class="inline">/.well-known/openid-configuration</code></td></tr>
+      <tr><td>UserInfo</td><td>n/a</td><td><code class="inline">/userinfo</code> endpoint (Bearer access_token)</td></tr>
+      <tr><td>Replay protection</td><td>state parameter</td><td>state + nonce (bound into id_token)</td></tr>
+    </table>
+  </div>
+
+  <div class="panel">
+    <h3 style="margin-top:0;">Discovery document</h3>
+    <p style="color:var(--muted);">Fetched live from <code class="inline" th:text="${issuer + '/.well-known/openid-configuration'}">disc</code>.</p>
+    <p><button class="btn" id="loadDiscovery">Load discovery</button></p>
+    <pre id="discoveryOut">(not loaded)</pre>
+  </div>
+
+  <div class="panel">
+    <h3 style="margin-top:0;">/userinfo (OIDC)</h3>
+    <p style="color:var(--muted);">
+      Resource-server style endpoint that returns the user's claims given a valid access_token.
+      Requires an active PKCE session.
+      <span class="badge bad" th:if="${!loggedIn}">not logged in</span>
+      <span class="badge good" th:if="${loggedIn}">logged in</span>
+    </p>
+    <p>
+      <button class="btn" id="loadUserinfo" th:disabled="${!loggedIn}">Call /userinfo</button>
+      <a class="btn secondary" th:if="${!loggedIn}" th:href="@{/oauth2/authorization/keycloak-pkce}">Login first</a>
+    </p>
+    <pre id="userinfoOut">(not called)</pre>
+  </div>
+
+  <script>
+    async function fetchTo(url, target) {
+      target.textContent = 'Loading ' + url + '...';
+      try {
+        const r = await fetch(url);
+        const t = await r.text();
+        try {
+          target.textContent = JSON.stringify(JSON.parse(t), null, 2);
+        } catch (e) {
+          target.textContent = t;
+        }
+      } catch (e) {
+        target.textContent = 'Error: ' + e;
+      }
+    }
+    document.getElementById('loadDiscovery').addEventListener('click',
+      () => fetchTo('/demo/oidc/discovery', document.getElementById('discoveryOut')));
+    const ui = document.getElementById('loadUserinfo');
+    if (ui) ui.addEventListener('click',
+      () => fetchTo('/demo/oidc/userinfo', document.getElementById('userinfoOut')));
+  </script>
+</main>
+</body>
+</html>

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: layout('PKCE login result', ~{::main})}">
+<body>
+<main>
+  <h1>PKCE login result</h1>
+  <p style="color:var(--muted);">
+    Tokens issued by Keycloak after the PKCE code exchange. Three artefacts are returned:
+    the <strong>id_token</strong> (who the user is &mdash; OIDC), the <strong>access_token</strong>
+    (what the client may do &mdash; OAuth2), and optionally a <strong>refresh_token</strong>.
+  </p>
+
+  <div class="panel good">
+    <h3 style="margin-top:0;">Authenticated user</h3>
+    <dl class="kv">
+      <dt>preferred_username</dt><dd th:text="${user.preferredUsername}">u</dd>
+      <dt>email</dt><dd th:text="${user.email}">e</dd>
+      <dt>subject</dt><dd th:text="${user.subject}">s</dd>
+    </dl>
+  </div>
+
+  <div th:replace="~{fragments/token-card :: tokenCard('ID Token (OIDC)', ${idToken})}"></div>
+  <div th:replace="~{fragments/token-card :: tokenCard('Access Token (OAuth2)', ${accessToken})}"></div>
+  <div th:replace="~{fragments/token-card :: tokenCard('Refresh Token', ${refreshToken})}"></div>
+
+  <p style="margin-top:20px;">
+    <a class="btn secondary" th:href="@{/flows/refresh}">Try Refresh flow &rarr;</a>
+    <a class="btn secondary" th:href="@{/logout}">Logout</a>
+  </p>
+</main>
+</body>
+</html>

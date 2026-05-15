@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: layout('Authorization Code (no PKCE)', ~{::main})}">
+<body>
+<main>
+  <h1>Authorization Code (no PKCE)</h1>
+  <p style="color:var(--muted);max-width:780px;">
+    The classic OAuth2 server-side flow for <strong>confidential clients</strong> (apps that can keep
+    a secret on a backend). The browser only ever sees an opaque authorization code; the secret-bearing
+    backend swaps it for tokens at the <code class="inline">/token</code> endpoint.
+  </p>
+
+  <div class="panel warn">
+    <strong>When to use:</strong> traditional server-rendered web apps with a backend that can safely
+    store <code class="inline">client_secret</code>. For SPAs, mobile, CLIs &mdash; use
+    <a th:href="@{/flows/auth-code-pkce}">Authorization Code + PKCE</a> instead.
+  </div>
+
+  <div class="panel">
+    <h3>Sequence</h3>
+    <ol class="steps">
+      <li>Browser redirected to <code class="inline">/authorize?response_type=code&amp;client_id=...&amp;redirect_uri=...&amp;state=...</code>.</li>
+      <li>User logs in at Keycloak; redirected back with <code class="inline">?code=...&amp;state=...</code>.</li>
+      <li>Backend POSTs to <code class="inline">/token</code> with <code class="inline">grant_type=authorization_code</code>, <code class="inline">code</code>, <code class="inline">client_id</code>, and <code class="inline">client_secret</code>.</li>
+      <li>Keycloak returns <code class="inline">access_token</code>, <code class="inline">id_token</code>, <code class="inline">refresh_token</code>.</li>
+    </ol>
+  </div>
+
+  <div class="panel">
+    <h3>Client used</h3>
+    <dl class="kv">
+      <dt>registration id</dt><dd><code class="inline">keycloak-authcode</code></dd>
+      <dt>client_id</dt><dd><code class="inline">security-demo-authcode</code></dd>
+      <dt>client_secret</dt><dd><code class="inline">authcode-secret</code> (demo only)</dd>
+      <dt>PKCE</dt><dd><span class="badge bad">disabled</span></dd>
+    </dl>
+  </div>
+
+  <p>
+    <a class="btn" th:href="@{/oauth2/authorization/keycloak-authcode}">Start Auth Code login &rarr;</a>
+    <a class="btn secondary" th:href="@{/flows/auth-code/result}">View last result</a>
+  </p>
+</main>
+</body>
+</html>

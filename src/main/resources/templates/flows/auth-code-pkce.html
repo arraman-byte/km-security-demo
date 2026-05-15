@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: layout('Authorization Code + PKCE', ~{::main})}">
+<body>
+<main>
+  <h1>Authorization Code + PKCE</h1>
+  <p style="color:var(--muted);max-width:780px;">
+    The modern recommended browser/mobile flow. The client (public, no secret) generates a random
+    <code class="inline">code_verifier</code>, derives <code class="inline">code_challenge = BASE64URL(SHA256(verifier))</code>,
+    sends the challenge with the authorize request, and later proves possession by sending the
+    verifier when exchanging the code for tokens. This binds the authorization code to the client
+    instance and defeats code-interception attacks.
+  </p>
+
+  <div class="panel">
+    <h3>Sequence</h3>
+    <ol class="steps">
+      <li>Client generates <code class="inline">code_verifier</code> (random 43-128 chars) and computes <code class="inline">code_challenge</code>.</li>
+      <li>Browser is redirected to <code class="inline">/authorize</code> with <code class="inline">code_challenge</code> + <code class="inline">code_challenge_method=S256</code>.</li>
+      <li>User logs in; Keycloak redirects back with <code class="inline">?code=...</code>.</li>
+      <li>Spring exchanges the code at <code class="inline">/token</code>, sending the original <code class="inline">code_verifier</code>.</li>
+      <li>Keycloak hashes the verifier and compares to the stored challenge; on match, returns id_token + access_token (+ refresh_token).</li>
+    </ol>
+  </div>
+
+  <div class="panel">
+    <h3>Example PKCE values (regenerated on each page load)</h3>
+    <dl class="kv">
+      <dt>code_verifier</dt><dd><code class="inline" th:text="${sampleVerifier}">v</code></dd>
+      <dt>code_challenge</dt><dd><code class="inline" th:text="${sampleChallenge}">c</code></dd>
+      <dt>method</dt><dd><code class="inline">S256</code></dd>
+    </dl>
+    <p style="color:var(--muted);font-size:0.85rem;margin-top:10px;">
+      Note: Spring Security generates its own pair when you click Start &mdash; these are just for illustration.
+      Open browser DevTools &rarr; Network and watch the <code class="inline">/authorize</code>
+      request (carries the challenge) and the <code class="inline">/token</code> POST (carries the verifier).
+    </p>
+  </div>
+
+  <p>
+    <a class="btn" th:href="@{/oauth2/authorization/keycloak-pkce}">Start PKCE login &rarr;</a>
+    <a class="btn secondary" th:href="@{/flows/auth-code-pkce/result}">View last result</a>
+  </p>
+</main>
+</body>
+</html>

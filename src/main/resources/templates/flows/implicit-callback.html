@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: layout('Implicit callback', ~{::main})}">
+<body>
+<main>
+  <h1>Implicit callback</h1>
+
+  <div class="banner-deprecated">
+    Token data was just passed to your browser in the URL fragment (<code class="inline">#</code>).
+    Notice that the access_token is now in your address bar &mdash; this is the central security problem
+    with implicit flow.
+  </div>
+
+  <div class="panel">
+    <h3 style="margin-top:0;">Raw fragment</h3>
+    <pre id="rawFragment">(reading...)</pre>
+  </div>
+
+  <p id="status" style="color:var(--muted);"></p>
+
+  <div id="resultPanel" style="display:none;">
+    <h2>Decoded</h2>
+    <div id="result"></div>
+  </div>
+
+  <p><a class="btn secondary" th:href="@{/flows/implicit}">&larr; Back</a></p>
+
+  <script>
+    (function () {
+      const hash = window.location.hash || '';
+      document.getElementById('rawFragment').textContent = hash || '(no fragment present)';
+      if (!hash || hash.length < 2) {
+        document.getElementById('status').textContent = 'No tokens in URL.';
+        return;
+      }
+      const params = new URLSearchParams(hash.substring(1));
+      const accessToken = params.get('access_token');
+      const idToken = params.get('id_token');
+      const error = params.get('error');
+      if (error) {
+        document.getElementById('status').textContent = 'Error: ' + error + ' - ' + (params.get('error_description') || '');
+        return;
+      }
+      const body = new URLSearchParams();
+      if (accessToken) body.append('access_token', accessToken);
+      if (idToken) body.append('id_token', idToken);
+      fetch('/demo/implicit/decode?' + body.toString())
+        .then(r => r.json())
+        .then(data => {
+          document.getElementById('resultPanel').style.display = '';
+          let html = '';
+          if (data.idToken) html += renderTokenCard('ID Token', data.idToken);
+          if (data.accessToken) html += renderTokenCard('Access Token', data.accessToken);
+          document.getElementById('result').innerHTML = html;
+          document.getElementById('status').textContent = 'Decoded.';
+        })
+        .catch(e => {
+          document.getElementById('status').textContent = 'Decode failed: ' + e;
+        });
+
+      function escapeHtml(s) {
+        return String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+      }
+      function renderTokenCard(title, decoded) {
+        return `<div class="panel">
+          <h3>${title}</h3>
+          <p><span class="badge ${decoded.signatureValid ? 'good' : 'bad'}">${decoded.signatureValid ? 'signature valid' : 'signature not verified'}</span>
+             <span class="badge ${decoded.expired ? 'warn' : 'good'}">${decoded.expired ? 'expired' : 'active'}</span></p>
+          <h4 style="color:#94a3b8;">Header</h4><pre>${escapeHtml(decoded.headerJson || '')}</pre>
+          <h4 style="color:#94a3b8;">Claims</h4><pre>${escapeHtml(decoded.claimsJson || '')}</pre>
+          <h4 style="color:#94a3b8;">Raw</h4><pre>${escapeHtml(decoded.raw || '')}</pre>
+        </div>`;
+      }
+    })();
+  </script>
+</main>
+</body>
+</html>

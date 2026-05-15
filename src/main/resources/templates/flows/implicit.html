@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: layout('Implicit Flow (deprecated)', ~{::main})}">
+<body>
+<main>
+  <h1>Implicit Flow</h1>
+
+  <div class="banner-deprecated">
+    <strong>DEPRECATED &mdash; do not use in new applications.</strong><br/>
+    The Implicit grant returns tokens directly in the browser URL fragment, which means:
+    <ul style="margin:8px 0 0;">
+      <li>Tokens leak into browser history, referer headers, server logs.</li>
+      <li>No client authentication and no code-exchange step, so token replay is harder to prevent.</li>
+      <li>Refresh tokens are not issued.</li>
+    </ul>
+    OAuth 2.1 and the Browser-Based Apps BCP recommend <strong>Authorization Code + PKCE</strong> instead.
+    Shown here only so you can <em>see</em> the difference.
+  </div>
+
+  <p style="color:var(--muted);max-width:780px;">
+    Built originally for SPAs that couldn't safely keep a secret and couldn't easily perform a back-channel
+    token exchange. PKCE and modern browser CORS handling made it obsolete.
+  </p>
+
+  <div class="panel">
+    <h3>Sequence</h3>
+    <ol class="steps">
+      <li>Browser redirected to <code class="inline">/authorize?response_type=token id_token&amp;client_id=...&amp;redirect_uri=...&amp;nonce=...</code>.</li>
+      <li>User logs in.</li>
+      <li>Authorization server redirects to <code class="inline">redirect_uri#access_token=...&amp;id_token=...&amp;token_type=Bearer&amp;expires_in=...</code>.</li>
+      <li>JavaScript on the callback page reads <code class="inline">window.location.hash</code>.</li>
+    </ol>
+  </div>
+
+  <div class="panel">
+    <dl class="kv">
+      <dt>client_id</dt><dd><code class="inline" th:text="${clientId}">c</code></dd>
+      <dt>authorize endpoint</dt><dd><code class="inline" th:text="${authorizeEndpoint}">e</code></dd>
+      <dt>redirect_uri</dt><dd><code class="inline" th:text="${redirectUri}">r</code></dd>
+      <dt>response_type</dt><dd><code class="inline">token id_token</code></dd>
+    </dl>
+  </div>
+
+  <p><button class="btn danger" id="implicitStart">Start implicit flow (deprecated)</button></p>
+
+  <script th:inline="javascript">
+    const authorize = /*[[${authorizeEndpoint}]]*/ '';
+    const clientId  = /*[[${clientId}]]*/ '';
+    const redirect  = /*[[${redirectUri}]]*/ '';
+    document.getElementById('implicitStart').addEventListener('click', () => {
+      const nonce = Math.random().toString(36).slice(2);
+      const state = Math.random().toString(36).slice(2);
+      const params = new URLSearchParams({
+        response_type: 'token id_token',
+        client_id: clientId,
+        redirect_uri: redirect,
+        scope: 'openid profile email',
+        nonce: nonce,
+        state: state
+      });
+      window.location.href = authorize + '?' + params.toString();
+    });
+  </script>
+</main>
+</body>
+</html>

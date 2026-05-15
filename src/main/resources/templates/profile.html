@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: layout('Profile', ~{::main})}">
+<body>
+<main>
+  <h1>Profile</h1>
+  <div class="panel good">
+    <dl class="kv">
+      <dt>subject</dt><dd th:text="${user.subject}">s</dd>
+      <dt>preferred_username</dt><dd th:text="${user.preferredUsername}">u</dd>
+      <dt>email</dt><dd th:text="${user.email}">e</dd>
+      <dt>email_verified</dt><dd th:text="${user.emailVerified}">v</dd>
+    </dl>
+  </div>
+  <div class="panel">
+    <h3 style="margin-top:0;">All OIDC claims</h3>
+    <pre th:text="${user.claims}">claims</pre>
+  </div>
+</main>
+</body>
+</html>

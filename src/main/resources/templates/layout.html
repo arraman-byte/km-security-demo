@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:fragment="layout(title, content)">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title th:text="${title} ?: 'OAuth2 / OIDC Demo'">OAuth2 / OIDC Demo</title>
+  <link rel="stylesheet" th:href="@{/css/app.css}" />
+</head>
+<body>
+  <div class="banner-warn">
+    LOCAL DEMO ONLY &mdash; raw tokens are rendered in plain text. Never enable this in production
+    (<code class="inline">demo.expose-tokens</code>).
+  </div>
+  <header class="nav">
+    <div class="brand"><a th:href="@{/}">OAuth2 / OIDC Demo</a></div>
+    <nav>
+      <a th:href="@{/flows/oidc-vs-oauth}">OAuth2 vs OIDC</a>
+      <a th:href="@{/flows/auth-code}">Auth Code</a>
+      <a th:href="@{/flows/auth-code-pkce}">PKCE</a>
+      <a th:href="@{/flows/client-credentials}">Client Credentials</a>
+      <a th:href="@{/flows/device-code}">Device Code</a>
+      <a th:href="@{/flows/refresh}">Refresh</a>
+      <a th:href="@{/flows/implicit}">Implicit</a>
+    </nav>
+  </header>
+  <main>
+    <div th:replace="${content}">Content goes here</div>
+  </main>
+  <footer>
+    Spring Boot on :8081 &middot; Keycloak realm <code class="inline">auth-server</code> on :8080
+  </footer>
+</body>
+</html>

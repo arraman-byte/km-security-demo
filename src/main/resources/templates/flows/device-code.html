@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: layout('Device Code', ~{::main})}">
+<body>
+<main>
+  <h1>Device Authorization Grant (RFC 8628)</h1>
+  <p style="color:var(--muted);max-width:780px;">
+    For devices without a browser or with limited input (smart TVs, CLIs, IoT). The device shows a
+    short <em>user_code</em> and a URL; the user authorizes on a phone/laptop. Meanwhile the device
+    polls the token endpoint until the user finishes.
+  </p>
+
+  <div class="panel">
+    <h3>Sequence</h3>
+    <ol class="steps">
+      <li>Device POSTs to <code class="inline">/device_authorization</code> with <code class="inline">client_id</code>.</li>
+      <li>Server returns <code class="inline">device_code</code>, <code class="inline">user_code</code>, <code class="inline">verification_uri</code>, <code class="inline">interval</code>, <code class="inline">expires_in</code>.</li>
+      <li>User opens the URL on another device, enters the user_code, logs in, approves.</li>
+      <li>Device polls <code class="inline">/token</code> with <code class="inline">grant_type=urn:ietf:params:oauth:grant-type:device_code</code>; gets <code class="inline">authorization_pending</code> until approved, then tokens.</li>
+    </ol>
+  </div>
+
+  <div class="panel">
+    <dl class="kv">
+      <dt>client_id</dt><dd><code class="inline" th:text="${clientId}">c</code></dd>
+      <dt>issuer</dt><dd><code class="inline" th:text="${issuer}">i</code></dd>
+    </dl>
+  </div>
+
+  <p><button class="btn" id="startBtn">Start device flow</button></p>
+
+  <div class="panel" id="codePanel" style="display:none;">
+    <h3 style="margin-top:0;">Step 1 &mdash; user authorization</h3>
+    <p>Open this URL on another device:
+      <a id="verificationUri" target="_blank" rel="noopener" href="#">verification_uri</a></p>
+    <p style="display:none;">Or with code pre-filled:
+      <a id="verificationUriComplete" target="_blank" rel="noopener" href="#">verification_uri_complete</a></p>
+    <p>Enter this user_code:</p>
+    <pre id="userCode" style="font-size:1.8rem;text-align:center;letter-spacing:0.2em;">XXXX-XXXX</pre>
+  </div>
+
+  <p id="status" style="color:var(--muted);"></p>
+
+  <div id="resultPanel" style="display:none;">
+    <h2>Tokens</h2>
+    <div id="result"></div>
+  </div>
+  <script th:src="@{/js/device-poll.js}"></script>
+</main>
+</body>
+</html>
