@@ -5,16 +5,16 @@
 <main>
   <h1>Refresh result</h1>
 
-  <div th:if="${error}" class="panel bad">
+  <div th:if="${error != null}" class="panel bad">
     <p th:text="${error}">err</p>
   </div>
 
-  <div th:if="${!error}">
+  <div th:if="${error == null}">
     <div class="panel good">
       <h3 style="margin-top:0;">Outcome</h3>
       <dl class="kv">
-        <dt>previous expiry</dt><dd th:text="${before.expiresAt}">t</dd>
-        <dt>new expiry</dt><dd th:text="${newAccessToken != null ? newAccessToken.expiresAt : null}">t</dd>
+        <dt>previous expiry</dt><dd th:text="${before['expiresAt']}">t</dd>
+        <dt>new expiry</dt><dd th:text="${newAccessToken != null ? newAccessToken['expiresAt'] : null}">t</dd>
         <dt>refresh_token rotated</dt>
         <dd>
           <span class="badge good" th:if="${rotated}">yes (new refresh_token issued)</span>

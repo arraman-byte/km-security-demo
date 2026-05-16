@@ -4,26 +4,27 @@
 
 <div th:fragment="tokenCard(label, token)" class="panel">
   <h3 th:text="${label}">Token</h3>
-  <div th:if="${token == null or token.present == false}">
+  <div th:if="${token == null or token['present'] == false}">
     <p class="badge bad">absent</p>
   </div>
-  <div th:if="${token != null and token.present}">
+  <div th:if="${token != null and token['present']}">
     <div style="margin-bottom: 10px;">
-      <span class="badge good" th:if="${token.signatureValid}">signature valid</span>
-      <span class="badge bad" th:if="${token.signatureValid == false}">signature not verified</span>
-      <span class="badge warn" th:if="${token.expired}">expired</span>
-      <span class="badge good" th:if="${token.expired == false}">active</span>
-      <span class="badge" style="background:#1e293b;color:#94a3b8;" th:if="${token.expiresInSeconds != null}"
-            th:text="'expires in ' + ${token.expiresInSeconds} + 's'">expires</span>
+      <span class="badge good" th:if="${token['signatureValid']}">signature valid</span>
+      <span class="badge bad" th:if="${token['signatureValid'] == false}">signature not verified</span>
+      <span class="badge warn" th:if="${token['expired'] == true}">expired</span>
+      <span class="badge good" th:if="${token['expired'] == false}">active</span>
+      <span class="badge" style="background:#1e293b;color:#94a3b8;"
+            th:if="${token['expiresInSeconds'] != null}"
+            th:text="'expires in ' + ${token['expiresInSeconds']} + 's'">expires</span>
     </div>
     <h4 style="margin:8px 0 4px;color:#94a3b8;">Raw (Base64URL header.payload.signature)</h4>
-    <pre th:text="${token.raw}">jwt</pre>
+    <pre th:text="${token['raw']}">jwt</pre>
     <h4 style="margin:12px 0 4px;color:#94a3b8;">Header</h4>
-    <pre th:text="${token.headerJson}">header</pre>
+    <pre th:text="${token['headerJson']}">header</pre>
     <h4 style="margin:12px 0 4px;color:#94a3b8;">Claims</h4>
-    <pre th:text="${token.claimsJson}">claims</pre>
-    <p th:if="${token.signatureError != null}" style="color:#fca5a5;font-size:0.85rem;"
-       th:text="'Signature error: ' + ${token.signatureError}">err</p>
+    <pre th:text="${token['claimsJson']}">claims</pre>
+    <p th:if="${token['signatureError'] != null}" style="color:#fca5a5;font-size:0.85rem;"
+       th:text="'Signature error: ' + ${token['signatureError']}">err</p>
   </div>
 </div>
 
