@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
@@ -80,7 +81,12 @@ public class SecurityConfig {
             response.sendRedirect(request.getContextPath() + target);
         };
 
-        http.authorizeHttpRequests(authorize -> authorize
+        PathPatternRequestMatcher.Builder mvc = PathPatternRequestMatcher.withDefaults();
+        http.csrf(csrf -> csrf.ignoringRequestMatchers(
+                        mvc.matcher("/demo/device-code/**"),
+                        mvc.matcher("/demo/implicit/**"),
+                        mvc.matcher("/demo/oidc/**")))
+            .authorizeHttpRequests(authorize -> authorize
                 .requestMatchers(
                         "/",
                         "/flows/**",
